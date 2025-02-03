@@ -17,9 +17,11 @@ while i < 5 do
     i += 1
 end
 
-puts i
+puts "counter is #{i}"
 
 until i < 0 do 
     puts i
-    i = i -1
+    i = i -2
 end
+
+puts "counter is #{i}"
