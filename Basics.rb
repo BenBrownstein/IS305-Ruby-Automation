@@ -25,3 +25,9 @@ until i < 0 do
 end
 
 puts "counter is #{i}"
+
+def test (message="test")
+    return "This message says #{message}."
+end
+puts test
+puts test(123)
