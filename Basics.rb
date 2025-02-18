@@ -31,3 +31,11 @@ def test (message="test")
 end
 puts test
 puts test(123)
+
+
+(1..5).each do |num|
+    puts "Processing number: #{num}"
+  end
+(1...5).each do |num|
+    puts "Processing number: #{num}"
+  end 
