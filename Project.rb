@@ -1,6 +1,7 @@
 #PDF Multitool Project File
 require 'combine_pdf'
-
+require 'hexapdf'
+require 'pdf-reader'
 
 #Functions
 def split(file, page_number, filename1="split_front.pdf", filename2="split_back.pdf")
@@ -18,7 +19,7 @@ def split(file, page_number, filename1="split_front.pdf", filename2="split_back.
   puts "PDF split successfully: #{filename1} and #{filename2}!"
 end
 
-def join(file1, file2, filename = "combined.pdf")
+def join_pdf(file1, file2, filename = "combined.pdf")
   pdf = CombinePDF.new
   pdf << CombinePDF.load(file1) # Load and append the first PDF
   pdf << CombinePDF.load(file2) # Load and append the second PDF
@@ -40,17 +41,31 @@ def chunk (file, page_number1, page_number2, filename="chunk.pdf")
 end
 
 
-=begin
-convert_To_Plain_Text(file)
-  makes a newfile with the text of the pdf file
-  return newfile
+def convert_To_Plain_Text(file, filename= "text_from_pdf.txt")
 
-make_Form_Fillable(file, pagenumber, coordx, coordy, size)
-  makes a form fillable box starting at coordx, coordy on pagenumber of file and is size large
-  return newfile
-=end
+end
 
-join("D:/IS 305 Ruby/python toolbox certificate.pdf", "D:/IS 305 Ruby/intro to importing data cert.pdf")
-split("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 3)
-chunk("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 3, 5)
-chunk("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 2, 2, "singlepagechunk.pdf")
+
+def make_Form_Fillable(file, coordx, coordy, width, height, page_number=1, fieldname="text_field", filename = "form-fillable.pdf")
+  doc = HexaPDF::Document.open(file)
+  form = doc.acro_form(create: true)
+  field = form.create_text_field(fieldname)
+  page = doc.pages[page_number-1]
+  widget = field.create_widget(page, Rect: [coordx, coordy, coordx + width, coordy + height])
+  page[:Annots] = [] unless page[:Annots]
+  page[:Annots] << widget  
+  doc.write(filename)
+end
+
+
+# join_pdf("D:/IS 305 Ruby/python toolbox certificate.pdf", "D:/IS 305 Ruby/intro to importing data cert.pdf")
+
+# split("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 3)
+
+# chunk("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 3, 5)
+# chunk("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 2, 2, "singlepagechunk.pdf")
+
+#Creates a textbox underneath the date of the header
+# make_Form_Fillable("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 70, 615, 200, 20, page_number=1)
+
+convert_To_Plain_Text("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf")
