@@ -4,7 +4,7 @@ require 'hexapdf'
 require 'pdf-reader'
 
 #Functions
-def split(file, page_number, filename1="split_front.pdf", filename2="split_back.pdf")
+def split(file, page_number, filename1: "split_front.pdf", filename2: "split_back.pdf")
   pdf = CombinePDF.load(file)
   split_front_pdf = CombinePDF.new
   split_back_pdf = CombinePDF.new
@@ -19,7 +19,7 @@ def split(file, page_number, filename1="split_front.pdf", filename2="split_back.
   puts "PDF split successfully: #{filename1} and #{filename2}!"
 end
 
-def join_pdf(file1, file2, filename = "combined.pdf")
+def join_pdf(file1, file2, filename: "combined.pdf")
   pdf = CombinePDF.new
   pdf << CombinePDF.load(file1) # Load and append the first PDF
   pdf << CombinePDF.load(file2) # Load and append the second PDF
@@ -27,7 +27,7 @@ def join_pdf(file1, file2, filename = "combined.pdf")
   puts "PDFs merged successfully into #{filename}!"
 end 
 
-def chunk (file, page_number1, page_number2, filename="chunk.pdf")
+def chunk (file, page_number1, page_number2, filename: "chunk.pdf")
   pdf = CombinePDF.load(file)
   chunk_pdf = CombinePDF.new
   if page_number1 == page_number2
@@ -41,15 +41,26 @@ def chunk (file, page_number1, page_number2, filename="chunk.pdf")
 end
 
 
-def convert_To_Plain_Text(file, filename= "text_from_pdf.txt")
-
+def convert_To_Plain_Text(file, filename: "text_from_pdf.txt")
+reader = PDF::Reader.new(file)
+text = ""
+reader.pages.each do |page|
+  text += page.text
+end
+File.open(filename, "w") do |file|
+  file.write(text)
+end
 end
 
 
-def make_Form_Fillable(file, coordx, coordy, width, height, page_number=1, fieldname="text_field", filename = "form-fillable.pdf")
+def make_Form_Fillable(file, coordx, coordy, width, height, page_number: 1, fieldname:"text_field", filename: "form-fillable.pdf", single: true)
   doc = HexaPDF::Document.open(file)
   form = doc.acro_form(create: true)
-  field = form.create_text_field(fieldname)
+  if single == true
+    field = form.create_text_field(fieldname)
+  else
+    field = form.create_multiline_text_field(fieldname)
+  end
   page = doc.pages[page_number-1]
   widget = field.create_widget(page, Rect: [coordx, coordy, coordx + width, coordy + height])
   page[:Annots] = [] unless page[:Annots]
@@ -63,9 +74,10 @@ end
 # split("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 3)
 
 # chunk("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 3, 5)
-# chunk("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 2, 2, "singlepagechunk.pdf")
+# chunk("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 2, 2, filename: "singlepagechunk.pdf")
 
-#Creates a textbox underneath the date of the header
-# make_Form_Fillable("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 70, 615, 200, 20, page_number=1)
+# #Creates a textbox underneath the date of the header
+# make_Form_Fillable("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 70, 615, 200, 20, page_number: 1)
+# make_Form_Fillable("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 70, 615, 200, 20, page_number: 1, filename: "multiline.pdf", single: false)
 
-convert_To_Plain_Text("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf")
+# convert_To_Plain_Text("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf")
