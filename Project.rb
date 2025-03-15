@@ -23,7 +23,15 @@ end
 
 def join_pdf(file1, file2, filename: "combined.pdf")
   pdf = CombinePDF.new
-  pdf << CombinePDF.load(file1) # Load and append the first PDF
+  pdf << CombinePDF.load(file1)
+  pdf << CombinePDF.load(file2) # Load and append the second PDF
+  pdf.save(filename) # Save the merged PDF
+  puts "PDFs merged successfully into #{filename}!"
+end
+
+def join_pdf_auto(file1, file2, filename: "D:/IS 305 Ruby/Output/combined.pdf")
+  pdf = CombinePDF.new
+  pdf << CombinePDF.load(file1)
   pdf << CombinePDF.load(file2) # Load and append the second PDF
   pdf.save(filename) # Save the merged PDF
   puts "PDFs merged successfully into #{filename}!"
@@ -80,10 +88,25 @@ def convert_To_Plain_Text(file, filename: "text_from_pdf.txt")
 end
 
 def process_new_file_to_text(file)
-  # output_dir = "D:/IS 305 Ruby/Output"
-  # filename = File.join(output_dir, "Plain_Text_" + File.basename(file) + ".txt")
+  output_dir = "D:/IS 305 Ruby/Output"
+  filename = File.join(output_dir, "Plain_Text_" + File.basename(file) + ".txt")
   puts "New file detected: #{file}"
-  convert_To_Plain_Text(file)
+  convert_To_Plain_Text(file, filename: filename)
+end
+
+def process_new_file_to_combine_all(folder_path)
+  file_path = "D:/IS 305 Ruby/Output/combined.pdf"
+  pdf_files = Dir.glob(File.join(folder_path, "*.pdf"))
+  if pdf_files.size < 2
+    puts "Waiting for at least 2 PDFs... (Found: #{pdf_files.size})"
+    return
+  end
+  if File.exist?(file_path)
+    join_pdf_auto(file_path, pdf_files.first)
+  else
+    join_pdf_auto(pdf_files[0], pdf_files[1])  
+  end
+
 end
 
 watch_dir_plain_text = "D:/IS 305 Ruby/Make Plain Text"
@@ -93,8 +116,18 @@ listener1 = Listen.to(watch_dir_plain_text, only: /\.pdf$/) do |modified, added,
   end
 end
 
+watch_dir_combine_all = "D:/IS 305 Ruby/Combine All"
+listener2 = Listen.to(watch_dir_combine_all, only: /\.pdf$/) do |modified, added, removed|
+  if Dir.glob(File.join(watch_dir_combine_all, "*.pdf")).size >= 2
+    process_new_file_to_combine_all(watch_dir_combine_all)
+  else
+    puts "Waiting for at least 2 PDFs..."
+  end
+end
+
 puts "Watching folder for new PDF files..."
 listener1.start
+listener2.start
 sleep
 
 
