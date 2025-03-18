@@ -103,7 +103,7 @@ end
 
 # Makes a fillable box on a PDF file
 # Takes a file, x coordinate, y coordinate, width of the box, and the height of the box
-# The optionals are page number, fieldname for later usage with Hexapdf, filename, and if it is a single line or multi line text box
+# The optionals are page number, fieldname for later usage with Hexapdf and so multiple fields can be added to the same file, filename, and if it is a single line or multi line text box
 def make_Form_Fillable(file, coordx, coordy, width, height, page_number: 1, fieldname: "text_field", filename: "form-fillable.pdf", single: true)
   # Opens file using HexaPDF
   doc = HexaPDF::Document.open(file)
@@ -189,9 +189,9 @@ end
 # Lets user know that the listeners are running 
 puts "Watching folder for new PDF files..."
 # Starts the listeners for the events to occur
-listener1.start
-listener2.start
-sleep
+# listener1.start
+# listener2.start
+# sleep
 
 
 # file1 = file_Selection()
@@ -204,7 +204,7 @@ sleep
 # chunk_pdf("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 2, 2, filename: "singlepagechunk.pdf")
 
 # #Creates a textbox underneath the date of the header
-# make_Form_Fillable("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 70, 615, 200, 20, page_number: 1)
-# make_Form_Fillable("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf", 70, 615, 200, 20, page_number: 1, filename: "multiline.pdf", single: false)
+# make_Form_Fillable(file1, 55, 710, 200, 20, page_number: 1)
+make_Form_Fillable("D:/IS 305 Ruby/form-fillable.pdf", 415, 550, 160, 40, page_number: 1,fieldname: "second_field", filename: "multiline.pdf", single: false)
 
 # convert_To_Plain_Text("D:/IS 305 Ruby/Ben Brownstein IS305 Project Report.pdf")
